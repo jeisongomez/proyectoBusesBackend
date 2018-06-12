@@ -40,6 +40,52 @@ $app->get('/empleados', function() use($db, $app){
 	echo json_encode($result);
 });
 
+//añadir login
+$app->post('/add-login', function() use($app, $db){
+	$json = $app->request->post('json');
+	$data = json_decode($json, true);
+
+	$query = " INSERT INTO `login`(`NombreUsuario`, `Contrasena`) 
+			   VALUES ('{$data['NombreUsuario']}','{$data['Contrasena']}') ";
+
+	$insert = $db->query($query);
+
+	$result = array(
+		'status' => 'error',
+		'code'	 => 400,
+		'message' => 'El login NO se ha creado'
+	);
+
+	if($insert){
+		$result = array(
+			'status' => 'success',
+			'code'	 => 200,
+			'message' => 'login creado correctamente'
+		);
+	}
+
+	echo json_encode($result);
+});
+
+$app->get('/get-id-login', function() use($db, $app){
+
+	$sql = " SELECT `idLogin` FROM login WHERE `idLogin` = ( SELECT MAX( `idLogin` ) FROM login) ";
+	$query = $db->query($sql);
+
+	$empleados = array();
+	while ($empleado = $query->fetch_assoc()) {
+		$empleados[] = $empleado;
+	}
+
+	$result = array(
+			'status' => 'success',
+			'code'	 => 200,
+			'data' => $empleados
+		);
+
+	echo json_encode($result);
+});
+
 //mostrar un empleado
 $app->get('/empleados/:id', function($id) use($db, $app){
 	$sql = 'SELECT * FROM empleados WHERE idEmpleados = '.$id;
@@ -128,39 +174,17 @@ $app->post('/add-empleado', function() use($app, $db){
 	$json = $app->request->post('json');
 	$data = json_decode($json, true);
 
-	if(!isset($data['Nombre_empleado'])){
-		$data['Nombre_empleado']=null;
-	}
-
-	if(!isset($data['Apellido_empleado'])){
-		$data['Apellido_empleado']=null;
-    }
-    
-    if(!isset($data['Telefono'])){
-		$data['Telefono']=null;
-    }
-
-    if(!isset($data['Direccion'])){
-		$data['Direccion']=null;
-    }
-
-    if(!isset($data['Cargo'])){
-		$data['Cargo']=null;
-    }
-
-	$query = "INSERT INTO empleados VALUES(NULL,".
-			 "'{$data['Nombre_empleado']}', ".
-             "'{$data['Apellido_empleado']}', ".
-             "'{$data['Telefono']}', ".
-             "'{$data['Direccion']}', ".
-             "'{$data['Cargo']}'".
-			 ")";
+	$query = " INSERT INTO `empleados`(`Login_idLogin`, `Roles_idRoles`, `ubicacion`, 
+			   `Nombre`, `Apellido`, `Telefono`, `Direccion`, `Cargo`, `Email`) 
+			   VALUES ({$data['Login_idLogin']},{$data['Roles_idRoles']},'{$data['ubicacion']}',
+			   '{$data['Nombre']}','{$data['Apellido']}','{$data['Telefono']}',
+			   '{$data['Direccion']}','{$data['Cargo']}','{$data['Email']}') ";
 
 	$insert = $db->query($query);
 
 	$result = array(
 		'status' => 'error',
-		'code'	 => 404,
+		'code'	 => 400,
 		'message' => 'El empleado NO se ha creado'
 	);
 

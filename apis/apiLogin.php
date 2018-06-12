@@ -53,7 +53,7 @@ $app->post('/empleados', function() use($db, $app){
 	$json = $app->request->post('json');
     $data = json_decode($json, true);
     
-    $sql = "SELECT * FROM empleados WHERE idEmpleados = '{$data["id"]}'";
+    $sql = "SELECT * FROM empleados WHERE Login_idLogin = '{$data["id"]}'";
 
 	$query = $db->query($sql);
 
@@ -84,7 +84,7 @@ $app->post('/roles', function() use($db, $app){
 	$json = $app->request->post('json');
     $data = json_decode($json, true);
     
-    $sql = "SELECT * FROM roles WHERE idRoles = '{$data["id"]}'";
+    $sql = "SELECT * FROM roles WHERE idRoles = '{$data["Roles_idRoles"]}'";
 
 	$query = $db->query($sql);
 
