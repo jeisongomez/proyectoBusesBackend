@@ -4,7 +4,7 @@ require_once '../vendor/autoload.php';
 
 $app = new \Slim\Slim();
 
-$db = new mysqli('localhost', 'root', '', 'buses');
+$db = new mysqli('localhost', 'root', '', 'uvexpress');
 
 // Configuración de cabeceras
 header('Access-Control-Allow-Origin: *');
@@ -19,6 +19,40 @@ if($method == "OPTIONS") {
 //prueba para el API
 $app->get("/pruebas", function() use($app, $db){
 	echo "Hola mundo desde Slim PHP para clientes";
+});
+
+
+//verificar si el cliente existe
+$app->post('/clienteExist', function() use($db, $app){
+	$json = $app->request->post('json');
+    $data = json_decode($json, true);
+    
+    $sql = "SELECT * FROM cliente WHERE	Documento = '{$data["Documento"]}'";
+
+	$query = $db->query($sql);
+
+    $result = array(
+			'status' 	=> 'success',
+			'code'		=> 200,
+			'message' 	=> 'el cliente no existe'
+		);
+    
+    //var_dump($sql);
+    //var_dump($query);
+
+	if($query->num_rows == 1){
+		$usuario = $query->fetch_assoc();
+
+        $result = array(
+			'status' 	=> 'error',
+			'code'		=> 400,
+			'message'  => 'el cliente ya existe',
+			'data' 	=> $usuario
+		);
+	}
+
+	echo json_encode($result);
+
 });
 
 //mostrar todos los clientes 
@@ -126,23 +160,10 @@ $app->post('/add-cliente', function() use($app, $db){
 	$json = $app->request->post('json');
 	$data = json_decode($json, true);
 
-	if(!isset($data['Nombre_cliente'])){
-		$data['Nombre_cliente']=null;
-	}
-
-	if(!isset($data['Apellido_cliente'])){
-		$data['Apellido_cliente']=null;
-    }
-    
-    if(!isset($data['Documento_cliente'])){
-		$data['Documento_cliente']=null;
-    }
-
-	$query = "INSERT INTO cliente VALUES(NULL,".
-			 "'{$data['Nombre_cliente']}', ".
-             "'{$data['Apellido_cliente']}', ".
-             "'{$data['Documento_cliente']}'".
-			 ")";
+	$query = " INSERT INTO `cliente`(`Nombre`, `Apellido`, `Documento`, `Email`) 
+			   VALUES ('{$data["Nombre"]}','{$data["Apellido"]}','{$data["Documento"]}','{$data["Email"]}') ";
+	
+	//var_dump($query);
 
 	$insert = $db->query($query);
 

@@ -26,7 +26,7 @@ $app->post('/getrutas', function() use($app, $db){
 	$json = $app->request->post('json');
 	$data = json_decode($json, true);
 
-	$sql = "SELECT * FROM rutas WHERE Origen = '{$data["ubicacion"]}' ";
+	$sql = " SELECT * FROM `rutas` WHERE `Orgien` = '{$data["ubicacion"]}' ";
 
 	$query = $db->query($sql);
 

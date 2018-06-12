@@ -4,7 +4,7 @@ require_once '../vendor/autoload.php';
 
 $app = new \Slim\Slim();
 
-$db = new mysqli('localhost', 'root', '', 'buses');
+$db = new mysqli("localhost", "root", "", "uvexpress");
 
 // Configuración de cabeceras
 header('Access-Control-Allow-Origin: *');
@@ -40,82 +40,34 @@ $app->get('/buses', function() use($db, $app){
 	echo json_encode($result);
 });
 
-//mostrar un bus
-$app->get('/buses/:id', function($id) use($db, $app){
-	$sql = 'SELECT * FROM buses WHERE idBuses = '.$id;
-	$query = $db->query($sql);
-
-	$result = array(
-		'status' 	=> 'error',
-		'code'		=> 404,
-		'message' 	=> 'bus no disponible'
-	);
-
-	if($query->num_rows == 1){
-		$bus = $query->fetch_assoc();
-
-		$result = array(
-			'status' 	=> 'success',
-			'code'		=> 200,
-			'data' 	=> $bus
-		);
-	}
-
-	echo json_encode($result);
-});
-
-//eliminar un bus
-$app->get('/delete-bus/:id', function($id) use($db, $app){
-	$sql = 'DELETE FROM buses WHERE idBuses = '.$id;
-	$query = $db->query($sql);
-
-	if($query){
-		$result = array(
-			'status' 	=> 'success',
-			'code'		=> 200,
-			'message' 	=> 'El bus se ha eliminado correctamente!!'
-		);
-	}else{
-		$result = array(
-			'status' 	=> 'error',
-			'code'		=> 404,
-			'message' 	=> 'El bus no se ha eliminado!!'
-		);
-	}
-
-	echo json_encode($result);
-});
-
-//actualizar un bus
-$app->post('/update-bus/:id', function($id) use($db, $app){
+//obtener un bus
+$app->post('/bus-actual', function() use($db, $app){
 	$json = $app->request->post('json');
 	$data = json_decode($json, true);
+	
+	$sql = "SELECT * FROM `buses` WHERE `idBuses` = {$data["id"]} ";
 
-    $sql = "UPDATE buses SET ".
-		   "Placa = '{$data["Placa"]}', ".
-           "CapacidadPasajeros = '{$data["CapacidadPasajeros"]}' ".
-           "WHERE idBuses = {$id}";
-           
 	$query = $db->query($sql);
 
-	if($query){
-		$result = array(
+    $result = array(
+			'status' 	=> 'error',
+			'code'		=> 400,
+			'message' 	=> 'bus no disponible'
+		);
+    
+    //var_dump($sql);
+    //var_dump($query);
+
+	if($query->num_rows == 1){
+		$usuario = $query->fetch_assoc();
+
+        $result = array(
 			'status' 	=> 'success',
 			'code'		=> 200,
-			'message' 	=> 'El bus se ha actualizado correctamente!!'
+			'data' 	=> $usuario
 		);
-	}else{
-		$result = array(
-			'status' 	=> 'error',
-			'code'		=> 404,
-			'message' 	=> 'El bus no se ha actualizado!!'
-		);
-    }
-    
-    //echo var_dump($json);
-    //echo var_dump($data);
-    //echo var_dump($sql);
-    //echo var_dump($query);
+	}
+
 	echo json_encode($result);
 
 });

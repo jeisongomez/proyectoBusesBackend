@@ -4,7 +4,7 @@ require_once '../vendor/autoload.php';
 
 $app = new \Slim\Slim();
 
-$db = new mysqli('localhost', 'root', '', 'buses');
+$db = new mysqli('localhost', 'root', '', 'uvexpress');
 
 // Configuración de cabeceras
 header('Access-Control-Allow-Origin: *');
@@ -23,7 +23,7 @@ $app->get("/pruebas", function() use($app, $db){
 
 //mostrar todos los empleados 
 $app->get('/empleados', function() use($db, $app){
-	$sql = 'SELECT * FROM empleados;';
+	$sql = " SELECT * FROM `empleados` ";
 	$query = $db->query($sql);
 
 	$empleados = array();
